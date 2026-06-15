@@ -171,6 +171,18 @@ export default function WorkoutScreen({ route, navigation }: Props) {
 
       {/* Big "Done set" button — fixed at bottom */}
       <View style={styles.bottomBar}>
+        <View style={styles.dotsRow}>
+          {day.exercises.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.dot,
+                i < exerciseIndex && styles.dotDone,
+                i === exerciseIndex && styles.dotCurrent,
+              ]}
+            />
+          ))}
+        </View>
         <View style={styles.bottomProgressTrack}>
           <View
             style={[
@@ -293,6 +305,33 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: C.card,
     gap: 12,
+  },
+  dotsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 20,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: C.border,
+    backgroundColor: 'transparent',
+  },
+  dotDone: {
+    backgroundColor: C.green,
+    borderColor: C.green,
+  },
+  dotCurrent: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: C.text,
+    borderColor: C.text,
   },
   bottomProgressTrack: {
     height: 6,
