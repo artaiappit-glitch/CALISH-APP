@@ -13,13 +13,20 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.mattia.calisthenics"
+      "bundleIdentifier": "com.mattia.calisthenics",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0f0f0f"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "plugins": [
       [
@@ -28,6 +35,12 @@
           "microphonePermission": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "833cdab3-274a-45ab-9e3b-49357f4a1957"
+      }
+    },
+    "owner": "artaimilano"
   }
 }
