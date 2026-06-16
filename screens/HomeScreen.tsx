@@ -32,10 +32,20 @@ export default function HomeScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text variant="display">Training week</Text>
-            <Text variant="meta" color={colors.inkSecondary} style={styles.subtitle}>
-              {activeDays} sessions · pick a day to start
-            </Text>
+            <View style={styles.headerText}>
+              <Text variant="display">Training week</Text>
+              <Text variant="meta" color={colors.inkSecondary} style={styles.subtitle}>
+                {activeDays} sessions · pick a day to start
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.historyBtn}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('History')}
+              hitSlop={8}
+            >
+              <Feather name="clock" size={20} color={colors.ink} />
+            </TouchableOpacity>
           </View>
         }
         renderItem={({ item, index }) => {
@@ -83,9 +93,21 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: spacing.lg,
     paddingBottom: spacing.lg,
-    gap: spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.md,
   },
+  headerText: { flex: 1, gap: spacing.xs },
   subtitle: { marginTop: spacing.xs },
+  historyBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
   card: {
     backgroundColor: colors.background,

@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Feather from '@expo/vector-icons/Feather';
@@ -8,6 +8,7 @@ import type { RootStackParamList } from '../types/navigation';
 import RestTimer from '../components/RestTimer';
 import Text from '../src/components/ui/Text';
 import { colors, radius, spacing, shadow } from '../src/theme/tokens';
+import { addRecord } from '../src/storage/history';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Workout'>;
 type Phase = 'exercise' | 'rest' | 'done';
@@ -25,8 +26,27 @@ export default function WorkoutScreen({ route, navigation }: Props) {
   const [setIndex, setSetIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>('exercise');
 
+  // Workout starts when the screen mounts; guard so we record exactly once.
+  const startedAtRef = useRef(Date.now());
+  const savedRef = useRef(false);
+
   const totalExercises = day.exercises.length;
   const exercise = day.exercises[exerciseIndex] ?? null;
+
+  // Persist a history record the moment the workout is completed.
+  useEffect(() => {
+    if (phase !== 'done' || day.restDay || savedRef.current) return;
+    savedRef.current = true;
+    const completedAt = Date.now();
+    addRecord({
+      dayName: day.name,
+      focus: day.focus,
+      completedAt,
+      durationSec: Math.round((completedAt - startedAtRef.current) / 1000),
+      exercises: day.exercises.length,
+      sets: day.exercises.reduce((acc, ex) => acc + ex.sets, 0),
+    });
+  }, [phase, day]);
 
   const advanceAfterRest = useCallback(() => {
     if (!exercise) return;
@@ -85,9 +105,12 @@ export default function WorkoutScreen({ route, navigation }: Props) {
             {day.name} — {day.focus}
           </Text>
         </View>
-        <View style={[styles.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}>
+        <View style={[styles.bottomBar, styles.bottomBarStack, { paddingBottom: insets.bottom + spacing.md }]}>
           <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.85} onPress={() => navigation.navigate('Home')}>
             <Text variant="cardTitle" color={colors.onDark}>Back to schedule</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.7} onPress={() => navigation.navigate('History')}>
+            <Text variant="cardTitle" color={colors.ink}>View history</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -256,6 +279,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.hairline,
     gap: spacing.md,
   },
+  bottomBarStack: { gap: spacing.sm },
   dotsRow: {
     flexDirection: 'row',
     justifyContent: 'center',

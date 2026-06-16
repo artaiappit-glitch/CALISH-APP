@@ -15,6 +15,7 @@ import {
 import HomeScreen from './screens/HomeScreen';
 import PreviewScreen from './screens/PreviewScreen';
 import WorkoutScreen from './screens/WorkoutScreen';
+import HistoryScreen from './screens/HistoryScreen';
 import type { RootStackParamList } from './types/navigation';
 import { colors, fonts } from './src/theme/tokens';
 
@@ -76,6 +77,11 @@ export default function App() {
             name="Workout"
             component={WorkoutScreen}
             options={{ title: '' }} // title set dynamically inside the screen
+          />
+          <Stack.Screen
+            name="History"
+            component={HistoryScreen}
+            options={{ title: 'History', headerShown: true }}
           />
         </Stack.Navigator>
       </NavigationContainer>

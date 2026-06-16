@@ -3,4 +3,5 @@ export type RootStackParamList = {
   Home: undefined;
   Preview: { dayIndex: number };
   Workout: { dayIndex: number };
+  History: undefined;
 };
