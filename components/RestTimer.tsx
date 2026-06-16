@@ -27,7 +27,12 @@ export default function RestTimer({ seconds, onDone, onSkip }: Props) {
     setRemaining(left);
     if (left === 0 && !doneCalledRef.current) {
       doneCalledRef.current = true;
-      player.play();
+      try {
+        player.seekTo(0);
+        player.play();
+      } catch {
+        // ignore playback errors — advancing matters more than the beep
+      }
       clearInterval(intervalRef.current!);
       // Give the sound a moment to play before advancing.
       setTimeout(onDone, 800);

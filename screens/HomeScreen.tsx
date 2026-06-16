@@ -6,6 +6,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import workouts from '../data/workouts';
 import type { RootStackParamList } from '../types/navigation';
 import Text from '../src/components/ui/Text';
+import FloatingNavBar from '../src/components/ui/FloatingNavBar';
 import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -32,20 +33,10 @@ export default function HomeScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View style={styles.header}>
-            <View style={styles.headerText}>
-              <Text variant="display">Training week</Text>
-              <Text variant="meta" color={colors.inkSecondary} style={styles.subtitle}>
-                {activeDays} sessions · pick a day to start
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={styles.historyBtn}
-              activeOpacity={0.7}
-              onPress={() => navigation.navigate('History')}
-              hitSlop={8}
-            >
-              <Feather name="clock" size={20} color={colors.ink} />
-            </TouchableOpacity>
+            <Text variant="display">Training week</Text>
+            <Text variant="meta" color={colors.inkSecondary} style={styles.subtitle}>
+              {activeDays} sessions · pick a day to start
+            </Text>
           </View>
         }
         renderItem={({ item, index }) => {
@@ -79,6 +70,7 @@ export default function HomeScreen({ navigation }: Props) {
           );
         }}
       />
+      <FloatingNavBar active="home" />
     </SafeAreaView>
   );
 }
@@ -87,27 +79,15 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   list: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxxl,
+    paddingBottom: 112,
     gap: spacing.md,
   },
   header: {
     paddingTop: spacing.lg,
     paddingBottom: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: spacing.md,
+    gap: spacing.xs,
   },
-  headerText: { flex: 1, gap: spacing.xs },
   subtitle: { marginTop: spacing.xs },
-  historyBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surfaceMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 
   card: {
     backgroundColor: colors.background,

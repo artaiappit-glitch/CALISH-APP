@@ -5,6 +5,7 @@ import Feather from '@expo/vector-icons/Feather';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import Text from '../src/components/ui/Text';
+import FloatingNavBar from '../src/components/ui/FloatingNavBar';
 import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 import {
   getHistory,
@@ -66,11 +67,13 @@ export default function HistoryScreen({ navigation }: Props) {
         <TouchableOpacity style={styles.cta} activeOpacity={0.85} onPress={() => navigation.navigate('Home')}>
           <Text variant="cardTitle" color={colors.onDark}>Pick a workout</Text>
         </TouchableOpacity>
+        <FloatingNavBar active="history" />
       </View>
     );
   }
 
   return (
+    <View style={styles.container}>
     <FlatList
       style={styles.container}
       data={records ?? []}
@@ -115,12 +118,14 @@ export default function HistoryScreen({ navigation }: Props) {
         </TouchableOpacity>
       )}
     />
+      <FloatingNavBar active="history" />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  list: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.xxxl, gap: spacing.md },
+  list: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: 112, gap: spacing.md },
   center: { textAlign: 'center' },
 
   // ── Summary ──────────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
+import { setAudioModeAsync } from 'expo-audio';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -42,6 +43,11 @@ export default function App() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+
+  // Allow the rest-timer beep to sound even when the iOS silent switch is on.
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+  }, []);
 
   if (!fontsLoaded) {
     // Quiet white gate — avoids a flash of fallback fonts before Inter loads.
