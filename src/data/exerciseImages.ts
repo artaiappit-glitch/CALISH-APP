@@ -9,6 +9,7 @@ import type { ImageSourcePropType } from 'react-native';
 const EXERCISE_IMAGES: Record<string, ImageSourcePropType> = {
   // ── Pull ──────────────────────────────────────────────────────────────────
   'weighted-pull-ups': require('../../assets/exercises/weighted-pull-ups.png'),
+  'chin-ups': require('../../assets/exercises/chin-ups.png'),
   'ring-rows': require('../../assets/exercises/ring-rows.png'),
   'ring-face-pulls': require('../../assets/exercises/ring-face-pulls.png'),
   'ring-curls': require('../../assets/exercises/ring-curls.png'),

@@ -36,6 +36,7 @@ const workouts: Day[] = [
       },
       {
         name: 'Bar chin-ups, 12 kg',
+        image: 'chin-ups',
         sets: 4,
         reps: '4–6',
         restSeconds: 120,
