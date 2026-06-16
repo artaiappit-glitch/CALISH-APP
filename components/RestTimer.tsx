@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, AppState } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, AppState } from 'react-native';
 import { useAudioPlayer } from 'expo-audio';
+import Text from '../src/components/ui/Text';
+import { colors, radius, spacing, fonts } from '../src/theme/tokens';
 
-// A simple 440 Hz beep encoded as a tiny WAV file (base64 data URI).
-// This avoids needing a bundled asset file while still working in Expo Go.
-// The wav is: 44-byte header + 4410 samples of a 440 Hz sine at 44100 Hz (0.1 s).
+// A simple beep encoded as a tiny WAV file. Works in Expo Go without extra setup.
 const BEEP_URI = require('../assets/beep.wav');
 
 type Props = {
@@ -57,16 +57,16 @@ export default function RestTimer({ seconds, onDone, onSkip }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Rest</Text>
+      <Text variant="meta" color={colors.inkSecondary} style={styles.label}>REST</Text>
       <Text style={styles.countdown}>{mm}:{ss}</Text>
 
       <View style={styles.buttons}>
-        <TouchableOpacity style={styles.addBtn} onPress={addTime}>
-          <Text style={styles.addBtnText}>+15 s</Text>
+        <TouchableOpacity style={styles.addBtn} onPress={addTime} activeOpacity={0.7}>
+          <Text variant="cardTitle" color={colors.ink}>+15 s</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.skipBtn} onPress={onSkip}>
-          <Text style={styles.skipBtnText}>Skip rest</Text>
+        <TouchableOpacity style={styles.skipBtn} onPress={onSkip} activeOpacity={0.7}>
+          <Text variant="cardTitle" color={colors.inkSecondary}>Skip rest</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -74,56 +74,33 @@ export default function RestTimer({ seconds, onDone, onSkip }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 24,
-  },
-  label: {
-    color: '#a0a0a8',
-    fontSize: 18,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-  },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.xxl },
+  label: { letterSpacing: 2 },
   countdown: {
-    color: '#ffffff',
+    color: colors.ink,
     fontSize: 96,
-    fontWeight: '200',
+    lineHeight: 104,
+    fontFamily: fonts.light,
     fontVariant: ['tabular-nums'],
     letterSpacing: -2,
   },
-  buttons: {
-    flexDirection: 'row',
-    gap: 16,
-    marginTop: 8,
-  },
+  buttons: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.sm },
   addBtn: {
-    paddingVertical: 16,
-    paddingHorizontal: 28,
-    borderRadius: 14,
-    backgroundColor: '#2c2c2e',
-    minWidth: 100,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xxl,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surfaceMuted,
+    minWidth: 110,
     alignItems: 'center',
-  },
-  addBtnText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '600',
   },
   skipBtn: {
-    paddingVertical: 16,
-    paddingHorizontal: 28,
-    borderRadius: 14,
-    backgroundColor: '#1c1c1e',
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xxl,
+    borderRadius: radius.lg,
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: '#3a3a3c',
-    minWidth: 100,
+    borderColor: colors.hairline,
+    minWidth: 110,
     alignItems: 'center',
-  },
-  skipBtnText: {
-    color: '#a0a0a8',
-    fontSize: 18,
-    fontWeight: '600',
   },
 });

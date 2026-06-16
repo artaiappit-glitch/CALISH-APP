@@ -1,15 +1,11 @@
 import React, { useLayoutEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { View, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import workouts, { type Exercise } from '../data/workouts';
 import type { RootStackParamList } from '../types/navigation';
+import Text from '../src/components/ui/Text';
+import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Preview'>;
 
@@ -25,6 +21,7 @@ function estimateMins(exercises: Exercise[]): number {
 
 export default function PreviewScreen({ route, navigation }: Props) {
   const day = workouts[route.params.dayIndex];
+  const insets = useSafeAreaInsets();
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: day.name });
@@ -34,21 +31,21 @@ export default function PreviewScreen({ route, navigation }: Props) {
   const estMins = estimateMins(day.exercises);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} bounces={false}>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scroll} bounces={false} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.focusTitle}>{day.name}</Text>
-          <Text style={styles.focusSub}>{day.focus}</Text>
+          <Text variant="display">{day.name}</Text>
+          <Text variant="body" color={colors.inkSecondary}>{day.focus}</Text>
+        </View>
 
-          {/* Stats row */}
-          <View style={styles.statsRow}>
-            <Stat value={String(day.exercises.length)} label="exercises" />
-            <View style={styles.statDivider} />
-            <Stat value={String(totalSets)} label="sets" />
-            <View style={styles.statDivider} />
-            <Stat value={`~${estMins} min`} label="est. duration" />
-          </View>
+        {/* Stats row */}
+        <View style={styles.statsRow}>
+          <Stat value={String(day.exercises.length)} label="exercises" />
+          <View style={styles.statDivider} />
+          <Stat value={String(totalSets)} label="sets" />
+          <View style={styles.statDivider} />
+          <Stat value={`~${estMins}`} label="minutes" />
         </View>
 
         {/* Exercise list */}
@@ -56,11 +53,11 @@ export default function PreviewScreen({ route, navigation }: Props) {
           {day.exercises.map((ex, i) => (
             <View key={i} style={styles.exerciseRow}>
               <View style={styles.exerciseIndex}>
-                <Text style={styles.exerciseIndexText}>{i + 1}</Text>
+                <Text variant="meta" color={colors.inkSecondary} weight="600">{i + 1}</Text>
               </View>
               <View style={styles.exerciseInfo}>
-                <Text style={styles.exerciseName}>{ex.name}</Text>
-                <Text style={styles.exerciseSetsReps}>
+                <Text variant="cardTitle">{ex.name}</Text>
+                <Text variant="meta" color={colors.inkSecondary} style={styles.setsReps}>
                   {ex.sets} × {ex.reps}
                 </Text>
               </View>
@@ -70,134 +67,68 @@ export default function PreviewScreen({ route, navigation }: Props) {
       </ScrollView>
 
       {/* Start button pinned at bottom */}
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}>
         <TouchableOpacity
           style={styles.startBtn}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
           onPress={() => navigation.navigate('Workout', { dayIndex: route.params.dayIndex })}
         >
-          <Text style={styles.startBtnText}>Start workout</Text>
+          <Text variant="cardTitle" color={colors.onDark}>Start workout</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+      <Text variant="title">{value}</Text>
+      <Text variant="meta" color={colors.inkTertiary} style={styles.statLabel}>{label}</Text>
     </View>
   );
 }
 
-const C = {
-  bg: '#0f0f0f',
-  card: '#1c1c1e',
-  border: '#2c2c2e',
-  text: '#ffffff',
-  sub: '#a0a0a8',
-  muted: '#636366',
-  blue: '#0a84ff',
-};
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.bg },
-  scroll: { padding: 20, paddingBottom: 120, gap: 20 },
+  container: { flex: 1, backgroundColor: colors.background },
+  scroll: { paddingHorizontal: spacing.xl, paddingBottom: 120, gap: spacing.xl },
 
-  // ── Header ────────────────────────────────────────────────────────────────
-  header: {
-    backgroundColor: C.card,
-    borderRadius: 16,
-    padding: 20,
-    gap: 14,
-    borderWidth: 1,
-    borderColor: C.border,
-  },
-  focusTitle: {
-    color: C.text,
-    fontSize: 30,
-    fontWeight: '800',
-  },
-  focusSub: {
-    color: C.sub,
-    fontSize: 15,
-    marginTop: -8,
-  },
+  header: { gap: spacing.xs, paddingTop: spacing.xs },
 
   // ── Stats ─────────────────────────────────────────────────────────────────
   statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: C.border,
-    paddingTop: 14,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.lg,
   },
-  stat: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 2,
-  },
-  statValue: {
-    color: C.blue,
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  statLabel: {
-    color: C.muted,
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: C.border,
-  },
+  stat: { flex: 1, alignItems: 'center', gap: 2 },
+  statLabel: { textTransform: 'lowercase' },
+  statDivider: { width: 1, height: 32, backgroundColor: colors.hairline },
 
   // ── Exercise list ─────────────────────────────────────────────────────────
-  exerciseList: {
-    gap: 8,
-  },
+  exerciseList: { gap: spacing.sm },
   exerciseRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: C.card,
-    borderRadius: 12,
-    padding: 14,
-    gap: 14,
+    backgroundColor: colors.background,
+    borderRadius: radius.md,
+    padding: spacing.lg,
+    gap: spacing.lg,
     borderWidth: 1,
-    borderColor: C.border,
+    borderColor: colors.hairline,
   },
   exerciseIndex: {
     width: 28,
     height: 28,
-    borderRadius: 8,
-    backgroundColor: '#2c2c2e',
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  exerciseIndexText: {
-    color: C.muted,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  exerciseInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  exerciseName: {
-    color: C.text,
-    fontSize: 15,
-    fontWeight: '600',
-    lineHeight: 20,
-  },
-  exerciseSetsReps: {
-    color: C.blue,
-    fontSize: 13,
-    fontWeight: '600',
-  },
+  exerciseInfo: { flex: 1, gap: 2 },
+  setsReps: { marginTop: spacing.xs },
 
   // ── Bottom bar ────────────────────────────────────────────────────────────
   bottomBar: {
@@ -205,21 +136,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 20,
-    paddingBottom: 36,
-    backgroundColor: C.bg,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.md,
+    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: C.card,
+    borderTopColor: colors.hairline,
   },
   startBtn: {
-    backgroundColor: C.blue,
-    borderRadius: 16,
-    paddingVertical: 20,
+    backgroundColor: colors.dark,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
-  },
-  startBtnText: {
-    color: C.text,
-    fontSize: 20,
-    fontWeight: '700',
+    ...shadow.floating,
   },
 });

@@ -1,23 +1,20 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Feather from '@expo/vector-icons/Feather';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import workouts from '../data/workouts';
 import type { RootStackParamList } from '../types/navigation';
 import RestTimer from '../components/RestTimer';
+import Text from '../src/components/ui/Text';
+import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Workout'>;
 type Phase = 'exercise' | 'rest' | 'done';
 
 export default function WorkoutScreen({ route, navigation }: Props) {
   const day = workouts[route.params.dayIndex];
+  const insets = useSafeAreaInsets();
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: `${day.name} · ${day.focus}` });
@@ -60,35 +57,40 @@ export default function WorkoutScreen({ route, navigation }: Props) {
   // ── REST DAY ─────────────────────────────────────────────────────────────────
   if (day.restDay) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.centeredCard}>
           <Text style={styles.bigEmoji}>🌿</Text>
-          <Text style={styles.cardTitle}>{day.focus}</Text>
-          {day.note ? <Text style={styles.cardNote}>{day.note}</Text> : null}
+          <Text variant="display" style={styles.centerText}>{day.focus}</Text>
+          {day.note ? (
+            <Text variant="body" color={colors.inkSecondary} style={styles.centerText}>{day.note}</Text>
+          ) : null}
         </View>
-        <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.secondaryBtnText}>Back to schedule</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
+        <View style={[styles.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}>
+          <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.7} onPress={() => navigation.goBack()}>
+            <Text variant="cardTitle" color={colors.ink}>Back to schedule</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   }
 
   // ── WORKOUT COMPLETE ─────────────────────────────────────────────────────────
   if (phase === 'done') {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.centeredCard}>
           <Text style={styles.bigEmoji}>💪</Text>
-          <Text style={styles.cardTitle}>Workout complete</Text>
-          <Text style={styles.cardNote}>{day.name} — {day.focus}</Text>
+          <Text variant="display" style={styles.centerText}>Workout complete</Text>
+          <Text variant="body" color={colors.inkSecondary} style={styles.centerText}>
+            {day.name} — {day.focus}
+          </Text>
         </View>
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={() => navigation.navigate('Home')}
-        >
-          <Text style={styles.primaryBtnText}>Back to schedule</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
+        <View style={[styles.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}>
+          <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.85} onPress={() => navigation.navigate('Home')}>
+            <Text variant="cardTitle" color={colors.onDark}>Back to schedule</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   }
 
@@ -99,17 +101,17 @@ export default function WorkoutScreen({ route, navigation }: Props) {
   // ── REST TIMER ───────────────────────────────────────────────────────────────
   if (phase === 'rest') {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.restContext}>
-          <Text style={styles.restContextName}>{exercise.name}</Text>
-          <Text style={styles.restContextSub}>Set {currentSet} of {exercise.sets} done</Text>
+          <Text variant="cardTitle" style={styles.centerText}>{exercise.name}</Text>
+          <Text variant="meta" color={colors.inkTertiary}>Set {currentSet} of {exercise.sets} done</Text>
         </View>
         <RestTimer
           seconds={exercise.restSeconds}
           onDone={advanceAfterRest}
           onSkip={advanceAfterRest}
         />
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -121,21 +123,18 @@ export default function WorkoutScreen({ route, navigation }: Props) {
     .reduce((acc, ex) => acc + ex.sets, 0) + setIndex;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} bounces={false}>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scroll} bounces={false} showsVerticalScrollIndicator={false}>
         {/* Progress indicator */}
         <View style={styles.progressRow}>
-          <Text style={styles.progressText}>
+          <Text variant="meta" color={colors.inkSecondary} style={styles.centerText}>
             Exercise {exerciseIndex + 1} of {totalExercises}
-            {'  ·  '}
+            {'   ·   '}
             Set {currentSet} of {exercise.sets}
           </Text>
           <View style={styles.progressTrack}>
             <View
-              style={[
-                styles.progressFill,
-                { width: `${Math.round((slotsDone / slotsTotal) * 100)}%` },
-              ]}
+              style={[styles.progressFill, { width: `${Math.round((slotsDone / slotsTotal) * 100)}%` }]}
             />
           </View>
         </View>
@@ -143,34 +142,28 @@ export default function WorkoutScreen({ route, navigation }: Props) {
         {/* Exercise image / placeholder */}
         <View style={styles.imageBox}>
           {exercise.image ? (
-            <Image
-              source={{ uri: exercise.image }}
-              style={styles.image}
-              resizeMode="cover"
-            />
+            <Image source={{ uri: exercise.image }} style={styles.image} resizeMode="cover" />
           ) : (
             <View style={styles.imagePlaceholder}>
-              <Text style={styles.placeholderIcon}>🏋️</Text>
+              <Feather name="image" size={32} color={colors.inkTertiary} />
             </View>
           )}
         </View>
 
         {/* Exercise info */}
         <View style={styles.infoCard}>
-          <Text style={styles.exerciseName}>{exercise.name}</Text>
-          <Text style={styles.setsReps}>
-            {exercise.sets} × {exercise.reps}
-          </Text>
+          <Text variant="title">{exercise.name}</Text>
+          <Text variant="display" style={styles.setsReps}>{exercise.sets} × {exercise.reps}</Text>
           {exercise.note ? (
             <View style={styles.noteDivider}>
-              <Text style={styles.noteText}>{exercise.note}</Text>
+              <Text variant="body" color={colors.inkSecondary}>{exercise.note}</Text>
             </View>
           ) : null}
         </View>
       </ScrollView>
 
-      {/* Big "Done set" button — fixed at bottom */}
-      <View style={styles.bottomBar}>
+      {/* Bottom bar: dots → progress → action */}
+      <View style={[styles.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}>
         <View style={styles.dotsRow}>
           {day.exercises.map((_, i) => (
             <View
@@ -185,164 +178,102 @@ export default function WorkoutScreen({ route, navigation }: Props) {
         </View>
         <View style={styles.bottomProgressTrack}>
           <View
-            style={[
-              styles.bottomProgressFill,
-              { width: `${Math.round((slotsDone / slotsTotal) * 100)}%` },
-            ]}
+            style={[styles.bottomProgressFill, { width: `${Math.round((slotsDone / slotsTotal) * 100)}%` }]}
           />
         </View>
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={handleDoneSet}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.primaryBtnText}>Done set</Text>
+        <TouchableOpacity style={styles.primaryBtn} onPress={handleDoneSet} activeOpacity={0.85}>
+          <Text variant="cardTitle" color={colors.onDark}>Done set</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const C = {
-  bg: '#0f0f0f',
-  card: '#1c1c1e',
-  border: '#2c2c2e',
-  text: '#ffffff',
-  sub: '#a0a0a8',
-  muted: '#636366',
-  blue: '#0a84ff',
-  green: '#30d158',
-};
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.bg },
+  container: { flex: 1, backgroundColor: colors.background },
 
   // ── Shared ───────────────────────────────────────────────────────────────
-  centeredCard: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-    gap: 16,
-  },
-  bigEmoji: { fontSize: 72 },
-  cardTitle: { color: C.text, fontSize: 28, fontWeight: '700', textAlign: 'center' },
-  cardNote: { color: C.sub, fontSize: 16, textAlign: 'center', lineHeight: 24 },
+  centeredCard: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xxxl, gap: spacing.lg },
+  bigEmoji: { fontSize: 64 },
+  centerText: { textAlign: 'center' },
 
   primaryBtn: {
-    backgroundColor: C.blue,
-    borderRadius: 16,
-    paddingVertical: 20,
+    backgroundColor: colors.dark,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
-    marginHorizontal: 20,
+    ...shadow.floating,
   },
-  primaryBtnText: { color: C.text, fontSize: 20, fontWeight: '700' },
   secondaryBtn: {
-    margin: 20,
-    marginBottom: 40,
-    backgroundColor: C.card,
-    borderRadius: 16,
-    paddingVertical: 18,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: C.border,
   },
-  secondaryBtnText: { color: C.sub, fontSize: 18, fontWeight: '600' },
 
-  // ── Rest context (shown behind timer) ───────────────────────────────────
-  restContext: {
-    paddingTop: 28,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    gap: 6,
-  },
-  restContextName: { color: C.text, fontSize: 18, fontWeight: '600', textAlign: 'center' },
-  restContextSub: { color: C.muted, fontSize: 14 },
+  // ── Rest context (shown above timer) ───────────────────────────────────────
+  restContext: { paddingTop: spacing.xxxl, paddingHorizontal: spacing.xxl, alignItems: 'center', gap: spacing.xs },
 
   // ── Exercise scroll ──────────────────────────────────────────────────────
-  scroll: { padding: 20, paddingBottom: 120, gap: 20 },
+  scroll: { padding: spacing.xl, paddingBottom: 180, gap: spacing.xl },
 
-  progressRow: { gap: 8 },
-  progressText: { color: C.sub, fontSize: 14, textAlign: 'center' },
-  progressTrack: { height: 4, backgroundColor: C.border, borderRadius: 2, overflow: 'hidden' },
-  progressFill: { height: 4, backgroundColor: C.blue, borderRadius: 2 },
+  progressRow: { gap: spacing.sm },
+  progressTrack: { height: 4, backgroundColor: colors.surfaceMuted, borderRadius: 2, overflow: 'hidden' },
+  progressFill: { height: 4, backgroundColor: colors.accent, borderRadius: 2 },
 
-  imageBox: { borderRadius: 16, overflow: 'hidden', height: 200 },
+  imageBox: { borderRadius: radius.lg, overflow: 'hidden', height: 200 },
   image: { width: '100%', height: '100%' },
   imagePlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: C.card,
+    backgroundColor: colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: C.border,
-    borderRadius: 16,
+    borderRadius: radius.lg,
   },
-  placeholderIcon: { fontSize: 60 },
 
   infoCard: {
-    backgroundColor: C.card,
-    borderRadius: 16,
-    padding: 20,
-    gap: 10,
+    backgroundColor: colors.background,
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+    gap: spacing.sm,
     borderWidth: 1,
-    borderColor: C.border,
+    borderColor: colors.hairline,
   },
-  exerciseName: { color: C.text, fontSize: 22, fontWeight: '700', lineHeight: 28 },
-  setsReps: { color: C.blue, fontSize: 30, fontWeight: '700' },
-  noteDivider: { borderTopWidth: 1, borderTopColor: C.border, paddingTop: 12 },
-  noteText: { color: C.sub, fontSize: 15, lineHeight: 22 },
+  setsReps: { marginTop: spacing.xs },
+  noteDivider: { borderTopWidth: 1, borderTopColor: colors.hairline, paddingTop: spacing.md, marginTop: spacing.xs },
 
+  // ── Bottom bar ────────────────────────────────────────────────────────────
   bottomBar: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    paddingTop: 12,
-    paddingBottom: 36,
-    backgroundColor: C.bg,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.md,
+    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: C.card,
-    gap: 12,
+    borderTopColor: colors.hairline,
+    gap: spacing.md,
   },
   dotsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 8,
-    paddingHorizontal: 20,
+    gap: spacing.sm,
   },
   dot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: radius.pill,
     borderWidth: 1.5,
-    borderColor: C.border,
+    borderColor: colors.inkTertiary,
     backgroundColor: 'transparent',
   },
-  dotDone: {
-    backgroundColor: C.green,
-    borderColor: C.green,
-  },
-  dotCurrent: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: C.text,
-    borderColor: C.text,
-  },
-  bottomProgressTrack: {
-    height: 6,
-    backgroundColor: C.border,
-    marginHorizontal: 20,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  bottomProgressFill: {
-    height: 6,
-    backgroundColor: C.green,
-    borderRadius: 3,
-  },
+  dotDone: { backgroundColor: colors.accent, borderColor: colors.accent },
+  dotCurrent: { width: 10, height: 10, borderRadius: radius.pill, backgroundColor: colors.ink, borderColor: colors.ink },
+
+  bottomProgressTrack: { height: 6, backgroundColor: colors.surfaceMuted, borderRadius: 3, overflow: 'hidden' },
+  bottomProgressFill: { height: 6, backgroundColor: colors.accent, borderRadius: 3 },
 });

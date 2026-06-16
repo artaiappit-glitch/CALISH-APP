@@ -1,65 +1,70 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Image,
-} from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Feather from '@expo/vector-icons/Feather';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import workouts from '../data/workouts';
 import type { RootStackParamList } from '../types/navigation';
+import Text from '../src/components/ui/Text';
+import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-// Static map so Metro can resolve require() at build time.
-// Drop your real PNGs into assets/icons/ and they'll show up automatically.
-const ICON_MAP: Record<string, number> = {
-  pull:   require('../assets/icons/pull.png'),
-  push:   require('../assets/icons/push.png'),
-  core:   require('../assets/icons/core.png'),
-  pull2:  require('../assets/icons/pull2.png'),
-  push2:  require('../assets/icons/push2.png'),
-  warmup: require('../assets/icons/warmup.png'),
+// Thin line icon per training day — monochrome, scannable as a set.
+const ICON_MAP: Record<string, keyof typeof Feather.glyphMap> = {
+  pull: 'chevron-up',
+  push: 'chevron-down',
+  core: 'target',
+  pull2: 'chevrons-up',
+  push2: 'chevrons-down',
+  warmup: 'wind',
 };
 
 export default function HomeScreen({ navigation }: Props) {
+  const activeDays = workouts.filter((d) => !d.restDay).length;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <FlatList
         data={workouts}
         keyExtractor={(_, i) => String(i)}
         contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Text variant="display">Training week</Text>
+            <Text variant="meta" color={colors.inkSecondary} style={styles.subtitle}>
+              {activeDays} sessions · pick a day to start
+            </Text>
+          </View>
+        }
         renderItem={({ item, index }) => {
-          const iconSource = item.icon ? ICON_MAP[item.icon] : undefined;
+          const iconName = item.icon ? ICON_MAP[item.icon] : undefined;
           return (
             <TouchableOpacity
               style={[styles.card, item.restDay && styles.cardRest]}
               onPress={() => navigation.navigate('Preview', { dayIndex: index })}
-              activeOpacity={0.7}
+              activeOpacity={0.6}
             >
-              {/* Day icon */}
-              {iconSource ? (
-                <Image source={iconSource} style={styles.icon} />
-              ) : (
-                <View style={styles.iconPlaceholder} />
-              )}
-
-              <View style={styles.cardInner}>
-                <Text style={styles.dayName}>{item.name}</Text>
-                <Text style={styles.focus}>{item.focus}</Text>
-                {item.restDay ? (
-                  <Text style={styles.restBadge}>Rest day</Text>
-                ) : (
-                  <Text style={styles.exerciseCount}>
-                    {item.exercises.length} exercises
-                  </Text>
-                )}
+              <View style={styles.iconChip}>
+                <Feather
+                  name={iconName ?? 'circle'}
+                  size={20}
+                  color={item.restDay ? colors.inkTertiary : colors.ink}
+                />
               </View>
 
-              <Text style={styles.chevron}>›</Text>
+              <View style={styles.cardInner}>
+                <Text variant="cardTitle">{item.name}</Text>
+                <Text variant="meta" color={colors.inkSecondary}>
+                  {item.focus}
+                </Text>
+                <Text variant="meta" color={colors.inkTertiary} style={styles.count}>
+                  {item.restDay ? 'Rest day' : `${item.exercises.length} exercises`}
+                </Text>
+              </View>
+
+              <Feather name="chevron-right" size={20} color={colors.inkTertiary} />
             </TouchableOpacity>
           );
         }}
@@ -69,65 +74,43 @@ export default function HomeScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0f0f0f',
-  },
+  container: { flex: 1, backgroundColor: colors.background },
   list: {
-    padding: 16,
-    gap: 12,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xxxl,
+    gap: spacing.md,
   },
+  header: {
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.lg,
+    gap: spacing.xs,
+  },
+  subtitle: { marginTop: spacing.xs },
+
   card: {
-    backgroundColor: '#1c1c1e',
-    borderRadius: 14,
-    padding: 16,
+    backgroundColor: colors.background,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#2c2c2e',
-    gap: 14,
+    borderColor: colors.hairline,
+    gap: spacing.lg,
+    minHeight: 76,
+    ...shadow.card,
   },
   cardRest: {
-    opacity: 0.65,
+    backgroundColor: colors.surfaceMuted,
+    ...shadow.pill,
   },
-  icon: {
+  iconChip: {
     width: 44,
     height: 44,
-    borderRadius: 10,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  iconPlaceholder: {
-    width: 44,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: '#2c2c2e',
-  },
-  cardInner: {
-    flex: 1,
-    gap: 3,
-  },
-  dayName: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  focus: {
-    color: '#a0a0a8',
-    fontSize: 14,
-  },
-  exerciseCount: {
-    color: '#636366',
-    fontSize: 13,
-    marginTop: 1,
-  },
-  restBadge: {
-    color: '#636366',
-    fontSize: 13,
-    marginTop: 1,
-    fontStyle: 'italic',
-  },
-  chevron: {
-    color: '#636366',
-    fontSize: 28,
-    lineHeight: 32,
-  },
+  cardInner: { flex: 1, gap: 2 },
+  count: { marginTop: spacing.xs },
 });
