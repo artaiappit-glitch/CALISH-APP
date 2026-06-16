@@ -9,6 +9,7 @@ import RestTimer from '../components/RestTimer';
 import Text from '../src/components/ui/Text';
 import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 import { addRecord } from '../src/storage/history';
+import { exerciseImage } from '../src/data/exerciseImages';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Workout'>;
 type Phase = 'exercise' | 'rest' | 'done';
@@ -164,8 +165,8 @@ export default function WorkoutScreen({ route, navigation }: Props) {
 
         {/* Exercise image / placeholder */}
         <View style={styles.imageBox}>
-          {exercise.image ? (
-            <Image source={{ uri: exercise.image }} style={styles.image} resizeMode="cover" />
+          {exerciseImage(exercise.image) ? (
+            <Image source={exerciseImage(exercise.image)} style={styles.image} resizeMode="cover" />
           ) : (
             <View style={styles.imagePlaceholder}>
               <Feather name="image" size={32} color={colors.inkTertiary} />

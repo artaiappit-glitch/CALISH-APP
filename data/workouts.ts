@@ -7,7 +7,7 @@ export type Exercise = {
   reps: string;       // free-form, e.g. "6", "6–8", "max hold", "~10 min"
   restSeconds: number;
   note?: string;
-  image?: string;     // relative path from assets/, e.g. "exercises/pullup.jpg"
+  image?: string;     // slug key into src/data/exerciseImages.ts, e.g. "ring-dips"
 };
 
 export type Day = {
@@ -28,6 +28,7 @@ const workouts: Day[] = [
     exercises: [
       {
         name: 'Weighted pull-ups, 12 kg (bar)',
+        image: 'weighted-pull-ups',
         sets: 4,
         reps: '6',
         restSeconds: 150,
@@ -42,6 +43,7 @@ const workouts: Day[] = [
       },
       {
         name: 'Ring rows, fully horizontal',
+        image: 'ring-rows',
         sets: 4,
         reps: '8',
         restSeconds: 90,
@@ -49,18 +51,21 @@ const workouts: Day[] = [
       },
       {
         name: 'Ring face-pulls / rear-delt',
+        image: 'ring-face-pulls',
         sets: 3,
         reps: '12–20',
         restSeconds: 60,
       },
       {
         name: 'Ring biceps curls (lean back)',
+        image: 'ring-curls',
         sets: 3,
         reps: '10–15',
         restSeconds: 60,
       },
       {
         name: 'Front-lever tuck holds',
+        image: 'front-lever-tuck',
         sets: 3,
         reps: '20–30s',
         restSeconds: 60,
@@ -77,6 +82,7 @@ const workouts: Day[] = [
     exercises: [
       {
         name: 'Ring dips (deep, RTO if able), weighted',
+        image: 'ring-dips',
         sets: 4,
         reps: '6–8',
         restSeconds: 120,
@@ -84,30 +90,35 @@ const workouts: Day[] = [
       },
       {
         name: 'Pike push-ups (feet elevated) → HSPU prog.',
+        image: 'pike-push-ups',
         sets: 4,
         reps: '6–10',
         restSeconds: 90,
       },
       {
         name: 'Ring flys',
+        image: 'ring-flys',
         sets: 3,
         reps: '10–15',
         restSeconds: 60,
       },
       {
         name: 'Pseudo-planche push-ups (parallettes)',
+        image: 'pseudo-planche-push-ups',
         sets: 3,
         reps: '8–12',
         restSeconds: 60,
       },
       {
         name: 'Ring triceps extensions (overhead/skull)',
+        image: 'ring-triceps-extensions',
         sets: 3,
         reps: '10–15',
         restSeconds: 60,
       },
       {
         name: 'Hollow-body holds, 12 kg',
+        image: 'hollow-body-holds',
         sets: 3,
         reps: 'max hold',
         restSeconds: 45,
