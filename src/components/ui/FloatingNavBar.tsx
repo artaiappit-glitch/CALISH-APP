@@ -1,43 +1,47 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Feather from '@expo/vector-icons/Feather';
 import Text from './Text';
 import { colors, radius, spacing, shadow } from '../../theme/tokens';
-import type { RootStackParamList } from '../../../types/navigation';
 
-type Nav = NativeStackNavigationProp<RootStackParamList>;
-type Tab = 'home' | 'history';
+const ICONS: Record<string, keyof typeof Feather.glyphMap> = {
+  Home: 'home',
+  History: 'clock',
+};
 
-const ITEMS: { key: Tab; label: string; icon: keyof typeof Feather.glyphMap; route: keyof RootStackParamList }[] = [
-  { key: 'home', label: 'Home', icon: 'home', route: 'Home' },
-  { key: 'history', label: 'History', icon: 'clock', route: 'History' },
-];
-
-export default function FloatingNavBar({ active }: { active: Tab }) {
+/**
+ * Custom floating tab bar for the bottom-tab navigator. Renders one pill with
+ * an item per tab; switching tabs keeps both screens mounted.
+ */
+export default function FloatingNavBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<Nav>();
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { bottom: insets.bottom + spacing.md }]}>
       <View style={styles.bar}>
-        {ITEMS.map((item) => {
-          const isActive = item.key === active;
+        {state.routes.map((route, index) => {
+          const isActive = state.index === index;
           const tint = isActive ? colors.ink : colors.inkTertiary;
+
+          const onPress = () => {
+            const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+            if (!isActive && !event.defaultPrevented) navigation.navigate(route.name);
+          };
+
           return (
             <TouchableOpacity
-              key={item.key}
+              key={route.key}
               style={styles.item}
               activeOpacity={0.7}
-              onPress={() => {
-                if (!isActive) navigation.navigate(item.route as 'Home');
-              }}
+              accessibilityRole="button"
+              accessibilityState={isActive ? { selected: true } : {}}
+              onPress={onPress}
             >
-              <Feather name={item.icon} size={20} color={tint} />
+              <Feather name={ICONS[route.name] ?? 'circle'} size={20} color={tint} />
               <Text variant="meta" color={tint} weight={isActive ? '600' : '500'}>
-                {item.label}
+                {route.name}
               </Text>
             </TouchableOpacity>
           );
@@ -48,12 +52,7 @@ export default function FloatingNavBar({ active }: { active: Tab }) {
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
+  wrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   bar: {
     flexDirection: 'row',
     backgroundColor: colors.background,

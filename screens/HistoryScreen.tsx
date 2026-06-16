@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { View, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, type CompositeScreenProps } from '@react-navigation/native';
 import Feather from '@expo/vector-icons/Feather';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../types/navigation';
+import type { RootStackParamList, TabParamList } from '../types/navigation';
 import Text from '../src/components/ui/Text';
-import FloatingNavBar from '../src/components/ui/FloatingNavBar';
 import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 import {
   getHistory,
@@ -16,7 +16,10 @@ import {
   type WorkoutRecord,
 } from '../src/storage/history';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'History'>;
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, 'History'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
 
 export default function HistoryScreen({ navigation }: Props) {
   const [records, setRecords] = useState<WorkoutRecord[] | null>(null);
@@ -67,13 +70,11 @@ export default function HistoryScreen({ navigation }: Props) {
         <TouchableOpacity style={styles.cta} activeOpacity={0.85} onPress={() => navigation.navigate('Home')}>
           <Text variant="cardTitle" color={colors.onDark}>Pick a workout</Text>
         </TouchableOpacity>
-        <FloatingNavBar active="history" />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
     <FlatList
       style={styles.container}
       data={records ?? []}
@@ -118,8 +119,6 @@ export default function HistoryScreen({ navigation }: Props) {
         </TouchableOpacity>
       )}
     />
-      <FloatingNavBar active="history" />
-    </View>
   );
 }
 

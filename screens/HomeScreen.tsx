@@ -2,14 +2,18 @@ import React from 'react';
 import { View, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Feather from '@expo/vector-icons/Feather';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import workouts from '../data/workouts';
-import type { RootStackParamList } from '../types/navigation';
+import type { RootStackParamList, TabParamList } from '../types/navigation';
 import Text from '../src/components/ui/Text';
-import FloatingNavBar from '../src/components/ui/FloatingNavBar';
 import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, 'Home'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
 
 // Thin line icon per training day — monochrome, scannable as a set.
 const ICON_MAP: Record<string, keyof typeof Feather.glyphMap> = {
@@ -70,7 +74,6 @@ export default function HomeScreen({ navigation }: Props) {
           );
         }}
       />
-      <FloatingNavBar active="home" />
     </SafeAreaView>
   );
 }

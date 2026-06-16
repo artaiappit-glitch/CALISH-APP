@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { setAudioModeAsync } from 'expo-audio';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -17,10 +18,31 @@ import HomeScreen from './screens/HomeScreen';
 import PreviewScreen from './screens/PreviewScreen';
 import WorkoutScreen from './screens/WorkoutScreen';
 import HistoryScreen from './screens/HistoryScreen';
-import type { RootStackParamList } from './types/navigation';
+import FloatingNavBar from './src/components/ui/FloatingNavBar';
+import type { RootStackParamList, TabParamList } from './types/navigation';
 import { colors, fonts } from './src/theme/tokens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
+
+// Home + History live as always-mounted tabs behind the custom floating bar.
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      tabBar={(props) => <FloatingNavBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+        headerStyle: { backgroundColor: colors.background },
+        headerTintColor: colors.ink,
+        headerShadowVisible: false,
+        headerTitleStyle: { fontFamily: fonts.semibold, fontSize: 17, color: colors.ink },
+      }}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="History" component={HistoryScreen} options={{ headerShown: true }} />
+    </Tab.Navigator>
+  );
+}
 
 // Light, monochrome navigation theme so screen backgrounds and chrome stay white.
 const navTheme = {
@@ -70,8 +92,8 @@ export default function App() {
           }}
         >
           <Stack.Screen
-            name="Home"
-            component={HomeScreen}
+            name="MainTabs"
+            component={MainTabs}
             options={{ headerShown: false }}
           />
           <Stack.Screen
@@ -83,11 +105,6 @@ export default function App() {
             name="Workout"
             component={WorkoutScreen}
             options={{ title: '' }} // title set dynamically inside the screen
-          />
-          <Stack.Screen
-            name="History"
-            component={HistoryScreen}
-            options={{ title: 'History', headerShown: true }}
           />
         </Stack.Navigator>
       </NavigationContainer>

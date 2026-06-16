@@ -107,10 +107,10 @@ export default function WorkoutScreen({ route, navigation }: Props) {
           </Text>
         </View>
         <View style={[styles.bottomBar, styles.bottomBarStack, { paddingBottom: insets.bottom + spacing.md }]}>
-          <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.85} onPress={() => navigation.navigate('Home')}>
+          <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.85} onPress={() => navigation.navigate('MainTabs', { screen: 'Home' })}>
             <Text variant="cardTitle" color={colors.onDark}>Back to schedule</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.7} onPress={() => navigation.navigate('History')}>
+          <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.7} onPress={() => navigation.navigate('MainTabs', { screen: 'History' })}>
             <Text variant="cardTitle" color={colors.ink}>View history</Text>
           </TouchableOpacity>
         </View>
