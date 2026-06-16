@@ -166,7 +166,7 @@ export default function WorkoutScreen({ route, navigation }: Props) {
         {/* Exercise image / placeholder */}
         <View style={styles.imageBox}>
           {exerciseImage(exercise.image) ? (
-            <Image source={exerciseImage(exercise.image)} style={styles.image} resizeMode="cover" />
+            <Image source={exerciseImage(exercise.image)} style={styles.image} resizeMode="contain" />
           ) : (
             <View style={styles.imagePlaceholder}>
               <Feather name="image" size={32} color={colors.inkTertiary} />
@@ -245,7 +245,8 @@ const styles = StyleSheet.create({
   progressTrack: { height: 4, backgroundColor: colors.surfaceMuted, borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: 4, backgroundColor: colors.accent, borderRadius: 2 },
 
-  imageBox: { borderRadius: radius.lg, overflow: 'hidden', height: 200 },
+  // Square to match the source art (1:1), so the full figure shows uncropped.
+  imageBox: { borderRadius: radius.lg, overflow: 'hidden', aspectRatio: 1, backgroundColor: colors.surfaceMuted },
   image: { width: '100%', height: '100%' },
   imagePlaceholder: {
     width: '100%',
