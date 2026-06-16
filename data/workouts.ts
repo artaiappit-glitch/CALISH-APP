@@ -135,6 +135,7 @@ const workouts: Day[] = [
     exercises: [
       {
         name: 'Skill — handstand OR front lever',
+        image: 'front-lever',
         sets: 1,
         reps: '~10 min',
         restSeconds: 0, // skill work: no rest timer
@@ -142,12 +143,14 @@ const workouts: Day[] = [
       },
       {
         name: 'Weighted hanging leg raises',
+        image: 'hanging-leg-raises',
         sets: 4,
         reps: '10–12',
         restSeconds: 75,
       },
       {
         name: 'L-sit',
+        image: 'l-sit',
         sets: 4,
         reps: 'max hold',
         restSeconds: 75,
@@ -155,24 +158,28 @@ const workouts: Day[] = [
       },
       {
         name: 'Dragon flag (full or negatives)',
+        image: 'dragon-flag',
         sets: 4,
         reps: '5–8',
         restSeconds: 75,
       },
       {
         name: 'Ab-wheel or ring rollouts',
+        image: 'ab-wheel',
         sets: 3,
         reps: '8–12',
         restSeconds: 60,
       },
       {
         name: 'Pallof press / side plank (bands)',
+        image: 'pallof-press',
         sets: 3,
         reps: '12/side',
         restSeconds: 45,
       },
       {
         name: 'Weighted calf raises (optional)',
+        image: 'calf-raises',
         sets: 3,
         reps: '15',
         restSeconds: 45,
@@ -188,6 +195,7 @@ const workouts: Day[] = [
     exercises: [
       {
         name: 'Muscle-up practice',
+        image: 'muscle-up',
         sets: 5,
         reps: '3',
         restSeconds: 120,
@@ -195,30 +203,35 @@ const workouts: Day[] = [
       },
       {
         name: 'Explosive pull-ups',
+        image: 'explosive-pull-ups',
         sets: 4,
         reps: '4',
         restSeconds: 90,
       },
       {
         name: 'Wide-grip weighted pull-ups, 12 kg',
+        image: 'wide-grip-pull-ups',
         sets: 4,
         reps: '6–8',
         restSeconds: 120,
       },
       {
         name: 'Ring rows, hard leverage',
+        image: 'ring-rows-hard',
         sets: 4,
         reps: '8',
         restSeconds: 90,
       },
       {
         name: 'Ring curls',
+        image: 'ring-curls',
         sets: 3,
         reps: '10–15',
         restSeconds: 60,
       },
       {
         name: 'Front-lever tuck holds',
+        image: 'front-lever-tuck',
         sets: 3,
         reps: '20–30s',
         restSeconds: 60,
@@ -234,6 +247,7 @@ const workouts: Day[] = [
     exercises: [
       {
         name: 'Handstand / planche balance practice',
+        image: 'handstand',
         sets: 1,
         reps: '~10 min',
         restSeconds: 0, // skill work: no rest timer
@@ -241,36 +255,42 @@ const workouts: Day[] = [
       },
       {
         name: 'Ring dips',
+        image: 'ring-dips',
         sets: 3,
         reps: '10–12',
         restSeconds: 90,
       },
       {
         name: 'Archer / one-arm push-up progression',
+        image: 'archer-push-ups',
         sets: 3,
         reps: '6–8/side',
         restSeconds: 90,
       },
       {
         name: 'Ring flys',
+        image: 'ring-flys',
         sets: 3,
         reps: '12–15',
         restSeconds: 60,
       },
       {
         name: 'Ring triceps + lateral raises (bands)',
+        image: 'lateral-raises',
         sets: 3,
         reps: '12–15 each',
         restSeconds: 60,
       },
       {
         name: 'Planche lean',
+        image: 'planche-lean',
         sets: 3,
         reps: '20s',
         restSeconds: 45,
       },
       {
         name: 'Dragon-flag negatives',
+        image: 'dragon-flag-negatives',
         sets: 3,
         reps: '5',
         restSeconds: 60,
