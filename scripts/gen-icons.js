@@ -18,7 +18,8 @@ async function makeIcon(size, out) {
 (async () => {
   await makeIcon(1024, 'icon.png');
   await makeIcon(1024, 'adaptive-icon.png');
-  await makeIcon(1024, 'splash-icon.png');
   await makeIcon(48, 'favicon.png');
   console.log('Icons generated.');
+  // Note: splash-icon.png is built separately by scripts/gen-splash.js
+  // (full-black portrait canvas with the wordmark).
 })();
