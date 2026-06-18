@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setAudioModeAsync } from 'expo-audio';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, type InitialState } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -24,6 +25,10 @@ import { colors, fonts } from './src/theme/tokens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
+
+// Persist where the user was so a background-kill / reload resumes the
+// workout instead of dumping them back on Home.
+const NAV_STATE_KEY = 'nav_state_v1';
 
 // Home + History live as always-mounted tabs behind the custom floating bar.
 function MainTabs() {
@@ -71,14 +76,37 @@ export default function App() {
     setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
   }, []);
 
-  if (!fontsLoaded) {
-    // Quiet white gate — avoids a flash of fallback fonts before Inter loads.
+  // Restore the saved navigation state on launch.
+  const [navReady, setNavReady] = useState(false);
+  const [initialNavState, setInitialNavState] = useState<InitialState | undefined>();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await AsyncStorage.getItem(NAV_STATE_KEY);
+        if (saved) setInitialNavState(JSON.parse(saved));
+      } catch {
+        // ignore — start at the default route
+      } finally {
+        setNavReady(true);
+      }
+    })();
+  }, []);
+
+  if (!fontsLoaded || !navReady) {
+    // Quiet white gate — avoids a flash of fallback fonts / wrong screen.
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer theme={navTheme}>
+      <NavigationContainer
+        theme={navTheme}
+        initialState={initialNavState}
+        onStateChange={(state) => {
+          AsyncStorage.setItem(NAV_STATE_KEY, JSON.stringify(state)).catch(() => {});
+        }}
+      >
         <StatusBar style="dark" />
         <Stack.Navigator
           screenOptions={{

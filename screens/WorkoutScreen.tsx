@@ -9,6 +9,7 @@ import RestTimer from '../components/RestTimer';
 import Text from '../src/components/ui/Text';
 import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 import { addRecord } from '../src/storage/history';
+import { loadSession, saveSession, clearSession } from '../src/storage/session';
 import { exerciseImage } from '../src/data/exerciseImages';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Workout'>;
@@ -30,9 +31,54 @@ export default function WorkoutScreen({ route, navigation }: Props) {
   // Workout starts when the screen mounts; guard so we record exactly once.
   const startedAtRef = useRef(Date.now());
   const savedRef = useRef(false);
+  // Wait until we've checked storage before persisting, so we don't clobber a
+  // saved session with the initial defaults.
+  const [hydrated, setHydrated] = useState(false);
 
   const totalExercises = day.exercises.length;
   const exercise = day.exercises[exerciseIndex] ?? null;
+
+  // On mount: resume an in-progress session for this day if one was saved
+  // (survives backgrounding / app reload), otherwise begin a fresh one.
+  useEffect(() => {
+    if (day.restDay) {
+      setHydrated(true);
+      return;
+    }
+    let active = true;
+    loadSession().then((s) => {
+      if (!active) return;
+      if (s && s.dayIndex === route.params.dayIndex) {
+        setExerciseIndex(Math.min(s.exerciseIndex, day.exercises.length - 1));
+        setSetIndex(s.setIndex);
+        setPhase(s.phase);
+        startedAtRef.current = s.startedAt;
+      } else {
+        startedAtRef.current = Date.now();
+      }
+      setHydrated(true);
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist progress whenever it changes; clear it once the workout is done.
+  useEffect(() => {
+    if (!hydrated || day.restDay) return;
+    if (phase === 'done') {
+      clearSession();
+      return;
+    }
+    saveSession({
+      dayIndex: route.params.dayIndex,
+      exerciseIndex,
+      setIndex,
+      phase,
+      startedAt: startedAtRef.current,
+    });
+  }, [hydrated, phase, exerciseIndex, setIndex, day.restDay, route.params.dayIndex]);
 
   // Persist a history record the moment the workout is completed.
   useEffect(() => {
@@ -94,6 +140,9 @@ export default function WorkoutScreen({ route, navigation }: Props) {
       </View>
     );
   }
+
+  // Blank while we read any saved session, to avoid flashing set 1 first.
+  if (!hydrated) return <View style={styles.container} />;
 
   // ── WORKOUT COMPLETE ─────────────────────────────────────────────────────────
   if (phase === 'done') {

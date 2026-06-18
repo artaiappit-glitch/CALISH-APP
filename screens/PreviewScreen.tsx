@@ -5,6 +5,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import workouts, { type Exercise } from '../data/workouts';
 import type { RootStackParamList } from '../types/navigation';
 import Text from '../src/components/ui/Text';
+import { clearSession } from '../src/storage/session';
 import { colors, radius, spacing, shadow } from '../src/theme/tokens';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Preview'>;
@@ -71,7 +72,11 @@ export default function PreviewScreen({ route, navigation }: Props) {
         <TouchableOpacity
           style={styles.startBtn}
           activeOpacity={0.85}
-          onPress={() => navigation.navigate('Workout', { dayIndex: route.params.dayIndex })}
+          onPress={async () => {
+            // Start fresh — drop any previously-saved progress for an old session.
+            await clearSession();
+            navigation.navigate('Workout', { dayIndex: route.params.dayIndex });
+          }}
         >
           <Text variant="cardTitle" color={colors.onDark}>Start workout</Text>
         </TouchableOpacity>
