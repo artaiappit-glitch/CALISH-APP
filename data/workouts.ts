@@ -64,14 +64,6 @@ const workouts: Day[] = [
         reps: '10–15',
         restSeconds: 60,
       },
-      {
-        name: 'Front-lever tuck holds',
-        image: 'front-lever-tuck',
-        sets: 3,
-        reps: '20–30s',
-        restSeconds: 60,
-        note: 'Open the tuck when 30s is clean.',
-      },
     ],
   },
 
@@ -95,13 +87,6 @@ const workouts: Day[] = [
         sets: 4,
         reps: '6–10',
         restSeconds: 90,
-      },
-      {
-        name: 'Ring flys',
-        image: 'ring-flys',
-        sets: 3,
-        reps: '10–15',
-        restSeconds: 60,
       },
       {
         name: 'Pseudo-planche push-ups (parallettes)',
@@ -158,13 +143,6 @@ const workouts: Day[] = [
         note: 'Chase 30s.',
       },
       {
-        name: 'Dragon flag (full or negatives)',
-        image: 'dragon-flag',
-        sets: 4,
-        reps: '5–8',
-        restSeconds: 75,
-      },
-      {
         name: 'Ab-wheel or ring rollouts',
         image: 'ab-wheel',
         sets: 3,
@@ -176,13 +154,6 @@ const workouts: Day[] = [
         image: 'pallof-press',
         sets: 3,
         reps: '12/side',
-        restSeconds: 45,
-      },
-      {
-        name: 'Weighted calf raises (optional)',
-        image: 'calf-raises',
-        sets: 3,
-        reps: '15',
         restSeconds: 45,
       },
     ],
@@ -230,13 +201,6 @@ const workouts: Day[] = [
         reps: '10–15',
         restSeconds: 60,
       },
-      {
-        name: 'Front-lever tuck holds',
-        image: 'front-lever-tuck',
-        sets: 3,
-        reps: '20–30s',
-        restSeconds: 60,
-      },
     ],
   },
 
@@ -269,13 +233,6 @@ const workouts: Day[] = [
         restSeconds: 90,
       },
       {
-        name: 'Ring flys',
-        image: 'ring-flys',
-        sets: 3,
-        reps: '12–15',
-        restSeconds: 60,
-      },
-      {
         name: 'Ring triceps + lateral raises (bands)',
         image: 'lateral-raises',
         sets: 3,
@@ -288,13 +245,6 @@ const workouts: Day[] = [
         sets: 3,
         reps: '20s',
         restSeconds: 45,
-      },
-      {
-        name: 'Dragon-flag negatives',
-        image: 'dragon-flag-negatives',
-        sets: 3,
-        reps: '5',
-        restSeconds: 60,
       },
     ],
   },
