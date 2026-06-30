@@ -27,6 +27,9 @@ export default function WorkoutScreen({ route, navigation }: Props) {
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [setIndex, setSetIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>('exercise');
+  // Absolute time the current rest ends — persisted so the countdown survives
+  // a reload instead of restarting from full.
+  const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
 
   // Workout starts when the screen mounts; guard so we record exactly once.
   const startedAtRef = useRef(Date.now());
@@ -49,10 +52,15 @@ export default function WorkoutScreen({ route, navigation }: Props) {
     loadSession().then((s) => {
       if (!active) return;
       if (s && s.dayIndex === route.params.dayIndex) {
-        setExerciseIndex(Math.min(s.exerciseIndex, day.exercises.length - 1));
+        const exIdx = Math.min(s.exerciseIndex, day.exercises.length - 1);
+        setExerciseIndex(exIdx);
         setSetIndex(s.setIndex);
         setPhase(s.phase);
         startedAtRef.current = s.startedAt;
+        if (s.phase === 'rest') {
+          // Resume the exact remaining rest (or fall back to a fresh one).
+          setRestEndsAt(s.restEndsAt ?? Date.now() + day.exercises[exIdx].restSeconds * 1000);
+        }
       } else {
         startedAtRef.current = Date.now();
       }
@@ -77,8 +85,9 @@ export default function WorkoutScreen({ route, navigation }: Props) {
       setIndex,
       phase,
       startedAt: startedAtRef.current,
+      restEndsAt: phase === 'rest' && restEndsAt != null ? restEndsAt : undefined,
     });
-  }, [hydrated, phase, exerciseIndex, setIndex, day.restDay, route.params.dayIndex]);
+  }, [hydrated, phase, exerciseIndex, setIndex, restEndsAt, day.restDay, route.params.dayIndex]);
 
   // Persist a history record the moment the workout is completed.
   useEffect(() => {
@@ -97,6 +106,7 @@ export default function WorkoutScreen({ route, navigation }: Props) {
 
   const advanceAfterRest = useCallback(() => {
     if (!exercise) return;
+    setRestEndsAt(null);
     const isLastSet = setIndex + 1 >= exercise.sets;
     const isLastExercise = exerciseIndex + 1 >= totalExercises;
 
@@ -115,6 +125,7 @@ export default function WorkoutScreen({ route, navigation }: Props) {
   const handleDoneSet = useCallback(() => {
     if (!exercise) return;
     if (exercise.restSeconds > 0) {
+      setRestEndsAt(Date.now() + exercise.restSeconds * 1000);
       setPhase('rest');
     } else {
       advanceAfterRest();
@@ -180,9 +191,10 @@ export default function WorkoutScreen({ route, navigation }: Props) {
           <Text variant="meta" color={colors.inkTertiary}>Set {currentSet} of {exercise.sets} done</Text>
         </View>
         <RestTimer
-          seconds={exercise.restSeconds}
+          endsAt={restEndsAt ?? Date.now() + exercise.restSeconds * 1000}
           onDone={advanceAfterRest}
           onSkip={advanceAfterRest}
+          onExtend={(ms) => setRestEndsAt((e) => (e ?? Date.now()) + ms)}
         />
       </View>
     );

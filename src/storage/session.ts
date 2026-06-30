@@ -11,7 +11,8 @@ export type ActiveSession = {
   exerciseIndex: number;
   setIndex: number;
   phase: SessionPhase;
-  startedAt: number; // epoch ms when the workout began
+  startedAt: number;    // epoch ms when the workout began
+  restEndsAt?: number;  // epoch ms the current rest ends (only while phase === 'rest')
 };
 
 export async function loadSession(): Promise<ActiveSession | null> {

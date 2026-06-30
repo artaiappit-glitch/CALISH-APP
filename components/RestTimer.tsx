@@ -8,22 +8,27 @@ import { colors, radius, spacing, fonts } from '../src/theme/tokens';
 const BEEP_URI = require('../assets/beep.wav');
 
 type Props = {
-  seconds: number;         // starting countdown value
-  onDone: () => void;      // called when the timer reaches 0
-  onSkip: () => void;      // called when user taps "Skip rest"
+  endsAt: number;            // absolute epoch ms when the rest ends
+  onDone: () => void;        // called when the timer reaches 0
+  onSkip: () => void;        // called when user taps "Skip rest"
+  onExtend: (ms: number) => void; // add time (owned + persisted by the parent)
 };
 
-export default function RestTimer({ seconds, onDone, onSkip }: Props) {
-  // endTime lets us stay accurate when the screen is backgrounded briefly.
-  const endTimeRef = useRef<number>(Date.now() + seconds * 1000);
-  const [remaining, setRemaining] = useState(seconds);
+const remainingFrom = (endsAt: number) => Math.max(0, Math.round((endsAt - Date.now()) / 1000));
+
+export default function RestTimer({ endsAt, onDone, onSkip, onExtend }: Props) {
+  // Mirror the latest endsAt into a ref so the interval always sees fresh value.
+  const endsAtRef = useRef(endsAt);
+  endsAtRef.current = endsAt;
+
+  const [remaining, setRemaining] = useState(() => remainingFrom(endsAt));
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const doneCalledRef = useRef(false);
 
   const player = useAudioPlayer(BEEP_URI);
 
   const tick = useCallback(() => {
-    const left = Math.max(0, Math.round((endTimeRef.current - Date.now()) / 1000));
+    const left = remainingFrom(endsAtRef.current);
     setRemaining(left);
     if (left === 0 && !doneCalledRef.current) {
       doneCalledRef.current = true;
@@ -33,7 +38,7 @@ export default function RestTimer({ seconds, onDone, onSkip }: Props) {
       } catch {
         // ignore playback errors — advancing matters more than the beep
       }
-      clearInterval(intervalRef.current!);
+      if (intervalRef.current) clearInterval(intervalRef.current);
       // Give the sound a moment to play before advancing.
       setTimeout(onDone, 800);
     }
@@ -48,14 +53,12 @@ export default function RestTimer({ seconds, onDone, onSkip }: Props) {
   }, [tick]);
 
   useEffect(() => {
+    tick(); // sync immediately on mount / when endsAt changes (e.g. resumed)
     intervalRef.current = setInterval(tick, 500); // poll twice/sec for smoothness
-    return () => clearInterval(intervalRef.current!);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [tick]);
-
-  const addTime = () => {
-    endTimeRef.current += 15_000;
-    tick(); // refresh display immediately
-  };
 
   const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
   const ss = String(remaining % 60).padStart(2, '0');
@@ -66,7 +69,7 @@ export default function RestTimer({ seconds, onDone, onSkip }: Props) {
       <Text style={styles.countdown}>{mm}:{ss}</Text>
 
       <View style={styles.buttons}>
-        <TouchableOpacity style={styles.addBtn} onPress={addTime} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.addBtn} onPress={() => onExtend(15_000)} activeOpacity={0.7}>
           <Text variant="cardTitle" color={colors.ink}>+15 s</Text>
         </TouchableOpacity>
 
